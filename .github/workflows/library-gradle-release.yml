@@ -1,5 +1,19 @@
 name: gradle-based jvm libraries
 
+on:
+  workflow_call:
+    secrets:
+      MAVEN_CENTRAL_USER:
+        required: true
+      MAVEN_CENTRAL_PASSWORD:
+        required: true
+      SIGNING_KEY:
+        required: true
+      SIGNING_KEY_ID:
+        required: true
+      SIGNING_PASSWORD:
+        required: true
+
 jobs:
   build:
     if: "!contains(github.event.commits[0].message, 'release-')"
@@ -31,17 +45,11 @@ jobs:
       run: ./gradlew docJar
 
     - name: publish to maven central
-      env:
-        MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
-        MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-        SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
-        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
       run: |
-        echo "$SIGNING_KEY" | gpg --dearmor > ./key.gpg
-        echo "sonatypeUsername=$MAVEN_CENTRAL_USER" >> ./gradle.properties
-        echo "sonatypePassword=$MAVEN_CENTRAL_PASSWORD" >> ./gradle.properties
-        echo "signing.keyId=$SIGNING_KEY_ID" >> ./gradle.properties
+        echo "${{ secrets.SIGNING_KEY }}" | gpg --dearmor > ./key.gpg
+        echo "sonatypeUsername=${{ secrets.MAVEN_CENTRAL_USER }}" >> ./gradle.properties
+        echo "sonatypePassword=${{ secrets.MAVEN_CENTRAL_PASSWORD }}" >> ./gradle.properties
+        echo "signing.keyId=${{ secrets.SIGNING_KEY_ID}}" >> ./gradle.properties
         echo "signing.secretKeyRingFile=./key.gpg" >> ./gradle.properties
-        echo "signing.password=$SIGNING_PASSWORD" >> ./gradle.properties
+        echo "signing.password=${{ secrets.SIGNING_PASSWORD }}" >> ./gradle.properties
         ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
