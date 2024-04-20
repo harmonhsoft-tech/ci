@@ -2,6 +2,11 @@ name: gradle-based jvm libraries
 
 on:
   workflow_call:
+    inputs:
+      BUILD_ACTION:
+        type: string
+        description: a gradle task to build the project
+        default: build
     secrets:
       MAVEN_CENTRAL_USER:
         required: true
@@ -37,7 +42,7 @@ jobs:
           git push
 
       - name: build gradle distributions
-        run: ./gradlew buildGradleDist
+        run: ./gradlew ${{ inputs.BUILD_ACTION }}
 
       - name: build documentation jar
         run: ./gradlew docJar
