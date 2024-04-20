@@ -43,7 +43,7 @@ jobs:
       - name: increment project version
         run: |
           ./gradlew release-paperwork
-          git push
+#          git push
 
       - name: build gradle distributions
         run: ./gradlew ${{ inputs.BUILD_ACTION }} -x test
