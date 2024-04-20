@@ -1,0 +1,40 @@
+name: gradle-based jvm libraries
+
+on:
+  workflow_call:
+    secrets:
+      PUBLISH_KEY:
+        required: true
+      PUBLISH_SECRET:
+        required: true
+
+jobs:
+  build:
+    if: "!contains(github.event.commits[0].message, 'release-')"
+    runs-on: ubuntu-22.04
+    environment: ci
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
+      - name: increment project version
+        run: |
+          ./gradlew release-paperwork
+          git push
+
+      - name: build new version
+        run: ./gradlew build
+
+      - name: publish to the plugins repo
+        run: |
+          echo "gradle.publish.key=${{ secrets.PUBLISH_KEY }}" >> ./gradle.properties
+          echo "gradle.publish.secret=${{ secrets.PUBLISH_SECRET }}" >> ./gradle.properties
+          ./gradlew publishPlugins
