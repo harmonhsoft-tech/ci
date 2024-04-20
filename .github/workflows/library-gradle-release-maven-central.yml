@@ -43,7 +43,7 @@ jobs:
       - name: increment project version
         run: |
           ./gradlew release-paperwork
-#          git push
+          git push
 
       - name: build gradle distributions
         run: ./gradlew ${{ inputs.BUILD_ACTION }} -x test
@@ -60,4 +60,4 @@ jobs:
           echo "signing.keyId=${{ secrets.SIGNING_KEY_ID}}" >> ./gradle.properties
           echo "signing.secretKeyRingFile=./key.gpg" >> ./gradle.properties
           echo "signing.password=${{ secrets.SIGNING_PASSWORD }}" >> ./gradle.properties
-#          ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+          ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
