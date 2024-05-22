@@ -1,0 +1,46 @@
+name: gradle-based jvm service which are published into docker hub
+
+on:
+  workflow_call:
+    secrets:
+      DOCKER_ORGANISATION:
+        required: true
+      DOCKER_LOGIN:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+
+jobs:
+  build:
+    if: "!contains(github.event.commits[0].message, 'release-')"
+    runs-on: ubuntu-22.04
+    environment: ci
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
+      - name: build
+        run: |
+          ./gradlew release-paperwork
+          ./gradlew build -x test
+
+      - name: run tests
+        run: ./gradlew test cucumber
+
+      - name: increment project version
+        run: git push
+
+      - name: build and publish docker image
+        run: |
+          echo "dockerOrganisation=${{ secrets.DOCKER_ORGANISATION }}" >> ./gradle.properties
+          echo "dockerLogin=${{ secrets.DOCKER_LOGIN }}" >> ./gradle.properties
+          echo "dockerPassword=${{ secrets.DOCKER_PASSWORD }}" >> ./gradle.properties
+          ./gradlew bootBuildImage
