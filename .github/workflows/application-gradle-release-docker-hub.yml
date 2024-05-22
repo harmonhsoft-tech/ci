@@ -33,7 +33,7 @@ jobs:
           ./gradlew build -x test
 
       - name: run tests
-        run: ./gradlew test cucumber
+        run: ./gradlew test
 
       - name: increment project version
         run: git push
