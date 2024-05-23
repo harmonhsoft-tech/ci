@@ -38,8 +38,11 @@ jobs:
           ./gradlew release-paperwork
           ./gradlew build -x test
 
-      - name: run tests
+      - name: run unit tests
         run: ./gradlew test
+
+      - name: start-tets-environment
+        run: docker-compose up -f ./src/test/docker-compose.yml -d
 
       - name: increment project version
         run: git push
