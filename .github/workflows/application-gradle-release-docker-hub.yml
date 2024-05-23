@@ -42,7 +42,9 @@ jobs:
         run: ./gradlew test
 
       - name: start-tets-environment
-        run: docker-compose up -f ./src/test/docker-compose.yml -d
+        run: |
+          docker-compose -f ./src/test/docker-compose.yml up -d
+          ./gradlew verifyTestEnvRunning
 
       - name: increment project version
         run: git push
