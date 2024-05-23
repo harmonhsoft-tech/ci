@@ -27,6 +27,12 @@ jobs:
       - name: setup gradle
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
+      - name: configure-project
+        run: |
+          echo "dockerOrganisation=${{ secrets.DOCKER_ORGANISATION }}" >> ./gradle.properties
+          echo "dockerLogin=${{ secrets.DOCKER_LOGIN }}" >> ./gradle.properties
+          echo "dockerPassword=${{ secrets.DOCKER_PASSWORD }}" >> ./gradle.properties
+
       - name: build
         run: |
           ./gradlew release-paperwork
@@ -39,8 +45,4 @@ jobs:
         run: git push
 
       - name: build and publish docker image
-        run: |
-          echo "dockerOrganisation=${{ secrets.DOCKER_ORGANISATION }}" >> ./gradle.properties
-          echo "dockerLogin=${{ secrets.DOCKER_LOGIN }}" >> ./gradle.properties
-          echo "dockerPassword=${{ secrets.DOCKER_PASSWORD }}" >> ./gradle.properties
-          ./gradlew bootBuildImage
+        run: ./gradlew bootBuildImage
