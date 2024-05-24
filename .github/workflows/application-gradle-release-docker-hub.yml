@@ -41,12 +41,13 @@ jobs:
       - name: run unit tests
         run: ./gradlew test
 
-      - name: start-tets-environment
+      - name: cucumber
         run: |
           docker-compose -f ./src/test/docker-compose.yml up -d
           ./gradlew verifyTestEnvRunning
+          ./gradlew cucumber
 
-      - name: increment project version
+      - name: store-version-change
         run: git push
 
       - name: build and publish docker image
