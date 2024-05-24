@@ -52,5 +52,5 @@ jobs:
 
       - name: build and publish docker image
         run: |
-          env
+          export CI_ENV=true
           ./gradlew bootBuildImage
