@@ -51,4 +51,6 @@ jobs:
         run: git push
 
       - name: build and publish docker image
-        run: ./gradlew bootBuildImage
+        run: |
+          env
+          ./gradlew bootBuildImage
